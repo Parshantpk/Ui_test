@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ui_test/customButton.dart';
+import 'package:ui_test/navBar.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -13,6 +15,7 @@ class _HomePageState extends State<HomePage> {
       FirebaseFirestore.instance.collection('featured');
   final CollectionReference _cats =
       FirebaseFirestore.instance.collection('cats');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +42,7 @@ class _HomePageState extends State<HomePage> {
                       (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
                     if (streamSnapshot.hasData) {
                       return ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: streamSnapshot.data!.docs.length,
                           itemBuilder: (context, index) {
@@ -72,10 +76,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     Expanded(
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10.0,
-                                          vertical: 8.0,
-                                        ),
+                                        padding: const EdgeInsets.only(top: 8, bottom: 6, left: 10, right: 10),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.stretch,
@@ -88,8 +89,7 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             Padding(
                                               padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 6.0),
+                                                  const EdgeInsets.only(bottom: 3.0, top: 4.0),
                                               child: Text(
                                                 documentSnapshot['description'],
                                                 style: TextStyle(
@@ -100,47 +100,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                             ),
-                                            Container(
-                                              decoration: const BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(8.0),
-                                                ),
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.bottomCenter,
-                                                  end: Alignment.topCenter,
-                                                  stops: [0.0, 1.0],
-                                                  colors: [
-                                                    Color(0xFFFFAB91),
-                                                    Color(0xFFFF6F43),
-                                                  ],
-                                                ),
-                                              ),
-                                              child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  tapTargetSize:
-                                                      MaterialTapTargetSize
-                                                          .shrinkWrap,
-                                                  primary: Colors.transparent,
-                                                  shadowColor:
-                                                      Colors.transparent,
-                                                  elevation: 0,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0),
-                                                  ),
-                                                ),
-                                                onPressed: null,
-                                                child: const Text(
-                                                  'Add',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 14),
-                                                ),
-                                              ),
-                                            ),
+                                            const CustomButton(),
                                           ],
                                         ),
                                       ),
@@ -175,6 +135,7 @@ class _HomePageState extends State<HomePage> {
                       (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
                     if (streamSnapshot.hasData) {
                       return ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: streamSnapshot.data!.docs.length,
                           itemBuilder: (context, index) {
@@ -186,7 +147,7 @@ class _HomePageState extends State<HomePage> {
                               child: Container(
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color: Color(0xFFE0E0E0),
+                                    color: const Color(0xFFE0E0E0),
                                     width: 1.0,
                                   ),
                                   borderRadius: BorderRadius.circular(16.0),
@@ -208,10 +169,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     Expanded(
                                       child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 10.0,
-                                          vertical: 8.0,
-                                        ),
+                                        padding: const EdgeInsets.only(top: 8, bottom: 6, left: 10, right: 10),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.stretch,
@@ -224,8 +182,7 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                             Padding(
                                               padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 6.0),
+                                                  const EdgeInsets.only(bottom: 3.0, top: 4.0),
                                               child: Text(
                                                 documentSnapshot['description'],
                                                 style: TextStyle(
@@ -236,47 +193,7 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                             ),
-                                            Container(
-                                              decoration: const BoxDecoration(
-                                                borderRadius: BorderRadius.all(
-                                                  Radius.circular(8.0),
-                                                ),
-                                                gradient: LinearGradient(
-                                                  begin: Alignment.bottomCenter,
-                                                  end: Alignment.topCenter,
-                                                  stops: [0.0, 1.0],
-                                                  colors: [
-                                                    Color(0xFFFFAB91),
-                                                    Color(0xFFFF6F43),
-                                                  ],
-                                                ),
-                                              ),
-                                              child: ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  tapTargetSize:
-                                                      MaterialTapTargetSize
-                                                          .shrinkWrap,
-                                                  primary: Colors.transparent,
-                                                  shadowColor:
-                                                      Colors.transparent,
-                                                  elevation: 0,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0),
-                                                  ),
-                                                ),
-                                                onPressed: null,
-                                                child: const Text(
-                                                  'Add',
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.w500,
-                                                      fontSize: 14),
-                                                ),
-                                              ),
-                                            ),
+                                            const CustomButton(),
                                           ],
                                         ),
                                       ),
@@ -297,48 +214,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: _customBottomNavigationBar(),
-    );
-  }
-
-  Widget _customBottomNavigationBar() {
-    int _currentIndex = 0;
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          stops: [0.0, 1.0],
-          colors: [
-            Colors.white,
-            Color(0xFFFBE9E7),
-          ],
-        ),
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(36),
-          topRight: Radius.circular(36),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(top: 16),
-        child: BottomNavigationBar(
-          onTap: (value) {
-            if (value != _currentIndex) {
-              setState(() {
-                _currentIndex = value;
-              });
-              // widget.onTap(value);
-            }
-          },
-          currentIndex: _currentIndex,
-          selectedItemColor: Color(0xFFFF6F43),
-          unselectedItemColor: Color(0xDE000000),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Cats'),
-            BottomNavigationBarItem(icon: Icon(Icons.face), label: 'Me'),
-          ],
-        ),
-      ),
+      bottomNavigationBar: const NavBar(),
     );
   }
 }
