@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:ui_test/nav_bar.dart';
 import 'firebase_options.dart';
 import 'home_page.dart';
 
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Roboto',
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
+      home: const NavBar(),
     );
   }
 }

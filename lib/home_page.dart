@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ui_test/customButton.dart';
-import 'package:ui_test/navBar.dart';
+import 'package:ui_test/custom_button.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -16,6 +15,7 @@ class _HomePageState extends State<HomePage> {
   final CollectionReference _cats =
       FirebaseFirestore.instance.collection('cats');
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,15 +26,15 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Featured',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w700,
+                const Padding(
+                  padding: EdgeInsets.only(top: 8, bottom: 12),
+                  child: Text(
+                    'Featured',
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 5.0,
                 ),
                 StreamBuilder(
                   stream: _featured.snapshots(),
@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
                       (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
                     if (streamSnapshot.hasData) {
                       return ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: streamSnapshot.data!.docs.length,
                           itemBuilder: (context, index) {
@@ -76,7 +76,11 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     Expanded(
                                       child: Padding(
-                                        padding: const EdgeInsets.only(top: 8, bottom: 6, left: 10, right: 10),
+                                        padding: const EdgeInsets.only(
+                                            top: 8,
+                                            bottom: 6,
+                                            left: 10,
+                                            right: 10),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.stretch,
@@ -88,8 +92,8 @@ class _HomePageState extends State<HomePage> {
                                                   fontWeight: FontWeight.w700),
                                             ),
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.only(bottom: 3.0, top: 4.0),
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 3.0, top: 4.0),
                                               child: Text(
                                                 documentSnapshot['description'],
                                                 style: TextStyle(
@@ -100,7 +104,15 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                             ),
-                                            const CustomButton(),
+                                            CustomButton(
+                                              showAddButton: documentSnapshot[
+                                                  'button_state'],
+                                              title: documentSnapshot['title'],
+                                              description: documentSnapshot[
+                                                  'description'],
+                                              image: documentSnapshot['image'],
+                                              docId: documentSnapshot.id,
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -116,18 +128,15 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                 ),
-                const SizedBox(
-                  height: 20.0,
-                ),
-                const Text(
-                  'All cats',
-                  style: TextStyle(
-                    fontSize: 34,
-                    fontWeight: FontWeight.w700,
+                const Padding(
+                  padding: EdgeInsets.only(top: 22, bottom: 12),
+                  child: Text(
+                    'All cats',
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 5.0,
                 ),
                 StreamBuilder(
                   stream: _cats.snapshots(),
@@ -135,7 +144,7 @@ class _HomePageState extends State<HomePage> {
                       (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
                     if (streamSnapshot.hasData) {
                       return ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
+                          physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: streamSnapshot.data!.docs.length,
                           itemBuilder: (context, index) {
@@ -169,7 +178,11 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     Expanded(
                                       child: Padding(
-                                        padding: const EdgeInsets.only(top: 8, bottom: 6, left: 10, right: 10),
+                                        padding: const EdgeInsets.only(
+                                            top: 8,
+                                            bottom: 6,
+                                            left: 10,
+                                            right: 10),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.stretch,
@@ -181,8 +194,8 @@ class _HomePageState extends State<HomePage> {
                                                   fontWeight: FontWeight.w700),
                                             ),
                                             Padding(
-                                              padding:
-                                                  const EdgeInsets.only(bottom: 3.0, top: 4.0),
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 3.0, top: 4.0),
                                               child: Text(
                                                 documentSnapshot['description'],
                                                 style: TextStyle(
@@ -193,7 +206,15 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                             ),
-                                            const CustomButton(),
+                                            CustomButton(
+                                              showAddButton: documentSnapshot[
+                                                  'button_state'],
+                                              title: documentSnapshot['title'],
+                                              description: documentSnapshot[
+                                                  'description'],
+                                              image: documentSnapshot['image'],
+                                              docId: documentSnapshot.id,
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -214,7 +235,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      bottomNavigationBar: const NavBar(),
     );
   }
 }
