@@ -122,12 +122,6 @@ class _CustomButtonState extends State<CustomButton> {
               'image': widget.image,
               'button_state': false
             });
-            // await _myCats.add({
-            //   'title': widget.title,
-            //   'description': widget.description,
-            //   'image': widget.image,
-            //   'button_state': false
-            // });
             button_state = await _myCats.doc(widget.docId).get().then(
                 (DocumentSnapshot documentSnapshot) =>
                     documentSnapshot['button_state']);

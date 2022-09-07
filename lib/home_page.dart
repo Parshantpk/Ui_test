@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ui_test/custom_button.dart';
+import 'package:ui_test/get_shimmer.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,7 +17,6 @@ class _HomePageState extends State<HomePage> {
       FirebaseFirestore.instance.collection('featured');
   final CollectionReference _cats =
       FirebaseFirestore.instance.collection('cats');
-
 
   @override
   Widget build(BuildContext context) {
@@ -123,8 +125,28 @@ class _HomePageState extends State<HomePage> {
                             );
                           });
                     }
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    if (streamSnapshot.hasError) {
+                      return Text(
+                        'Sorry, we have some problems loading featured cats 😿',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black.withOpacity(
+                            0.6,
+                          ),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: 3,
+                      itemBuilder: (context, index) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: GetShimmer(),
+                        );
+                      },
                     );
                   },
                 ),
@@ -225,8 +247,28 @@ class _HomePageState extends State<HomePage> {
                             );
                           });
                     }
-                    return const Center(
-                      child: CircularProgressIndicator(),
+                    if (streamSnapshot.hasError) {
+                      return Text(
+                        'Sorry, we have some problems loading all other cats 😿',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black.withOpacity(
+                            0.6,
+                          ),
+                        ),
+                      );
+                    }
+                    return ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: 4,
+                      itemBuilder: (context, index) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: GetShimmer(),
+                        );
+                      },
                     );
                   },
                 ),

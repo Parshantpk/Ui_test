@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'custom_button.dart';
+import 'get_shimmer.dart';
 
 class MeScreen extends StatefulWidget {
   const MeScreen({Key? key}) : super(key: key);
@@ -12,6 +13,8 @@ class MeScreen extends StatefulWidget {
 class _MeScreenState extends State<MeScreen> {
   final CollectionReference _myCats =
       FirebaseFirestore.instance.collection('mycats');
+  final CollectionReference _profile =
+      FirebaseFirestore.instance.collection('profile');
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,55 +25,80 @@ class _MeScreenState extends State<MeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'catholder-22',
-                        style: TextStyle(
-                          fontSize: 34,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 16.0,
-                      ),
-                      Row(
-                        children: const [
-                          Text(
-                            'Age: ',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+              FutureBuilder<DocumentSnapshot>(
+                  future: _profile.doc('COngIb6U0tbaDs3LVQGt').get(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.hasData) {
+                      Map<String, dynamic> data =
+                          snapshot.data!.data() as Map<String, dynamic>;
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                data['title'],
+                                style: const TextStyle(
+                                  fontSize: 34,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 16.0,
+                              ),
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Age: ',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  Text(
+                                    data['age'].toString(),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: 77,
+                            height: 76,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(16.0),
+                              image: DecorationImage(
+                                fit: BoxFit.fill,
+                                image: AssetImage(data['image']),
+                              ),
                             ),
                           ),
-                          Text(
-                            '21',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          )
                         ],
-                      ),
-                    ],
-                  ),
-                  Container(
-                    width: 77,
-                    height: 76,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16.0),
-                      image: const DecorationImage(
-                        fit: BoxFit.fill,
-                        image: AssetImage('assets/images/cat2.png'),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return Text(
+                        'Sorry, we have some problems loading your profile 😿',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black.withOpacity(
+                            0.6,
+                          ),
+                        ),
+                      );
+                    }
+                    return const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                      child: GetShimmer(),
+                    );
+                  }),
               const SizedBox(
                 height: 30.0,
               ),
@@ -86,7 +114,8 @@ class _MeScreenState extends State<MeScreen> {
               ),
               StreamBuilder(
                 stream: _myCats.snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
+                builder:
+                    (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
                   if (streamSnapshot.hasData) {
                     return ListView.builder(
                         physics: const NeverScrollableScrollPhysics(),
@@ -114,15 +143,18 @@ class _MeScreenState extends State<MeScreen> {
                                       borderRadius: BorderRadius.circular(16.0),
                                       image: DecorationImage(
                                         fit: BoxFit.fill,
-                                        image:
-                                            AssetImage(documentSnapshot['image']),
+                                        image: AssetImage(
+                                            documentSnapshot['image']),
                                       ),
                                     ),
                                   ),
                                   Expanded(
                                     child: Padding(
                                       padding: const EdgeInsets.only(
-                                          top: 8, bottom: 6, left: 10, right: 10),
+                                          top: 8,
+                                          bottom: 6,
+                                          left: 10,
+                                          right: 10),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
@@ -139,17 +171,19 @@ class _MeScreenState extends State<MeScreen> {
                                             child: Text(
                                               documentSnapshot['description'],
                                               style: TextStyle(
-                                                color:
-                                                    Colors.black.withOpacity(0.6),
+                                                color: Colors.black
+                                                    .withOpacity(0.6),
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w400,
                                               ),
                                             ),
                                           ),
                                           CustomButton(
-                                            showAddButton: documentSnapshot['button_state'],
+                                            showAddButton: documentSnapshot[
+                                                'button_state'],
                                             title: documentSnapshot['title'],
-                                            description: documentSnapshot['description'],
+                                            description:
+                                                documentSnapshot['description'],
                                             image: documentSnapshot['image'],
                                             docId: documentSnapshot.id,
                                           ),
@@ -163,8 +197,28 @@ class _MeScreenState extends State<MeScreen> {
                           );
                         });
                   }
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                  if (streamSnapshot.hasError) {
+                    return Text(
+                      'Sorry, we have some problems loading my cats 😿',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black.withOpacity(
+                          0.6,
+                        ),
+                      ),
+                    );
+                  }
+                  return ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    shrinkWrap: true,
+                    itemCount: 5,
+                    itemBuilder: (context, index) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8.0),
+                        child: GetShimmer(),
+                      );
+                    },
                   );
                 },
               ),
