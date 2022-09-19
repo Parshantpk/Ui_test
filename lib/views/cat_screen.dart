@@ -1,22 +1,13 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:ui_test/custom_button.dart';
-import 'package:ui_test/get_shimmer.dart';
+import 'package:ui_test/widgets/add_button.dart';
+import 'package:ui_test/widgets/get_shimmer.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:ui_test/widgets/remove_button.dart';
 
-class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+import '../blocs/cat_bloc/cat_bloc.dart';
 
-  @override
-  State<HomePage> createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final CollectionReference _featured =
-      FirebaseFirestore.instance.collection('featured');
-  final CollectionReference _cats =
-      FirebaseFirestore.instance.collection('cats');
+class CatScreen extends StatelessWidget {
+  const CatScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,140 +29,28 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
-                StreamBuilder(
-                  stream: _featured.snapshots(),
-                  builder:
-                      (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-                    if (streamSnapshot.hasData) {
+                BlocBuilder<CatBloc, CatState>(
+                  builder: (context, state) {
+                    if (state is CatLoadingState) {
                       return ListView.builder(
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: streamSnapshot.data!.docs.length,
-                          itemBuilder: (context, index) {
-                            final DocumentSnapshot documentSnapshot =
-                                streamSnapshot.data!.docs[index];
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Color(0xFFE0E0E0),
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: BorderRadius.circular(16.0),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 94,
-                                      height: 94,
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(16.0),
-                                        image: DecorationImage(
-                                          fit: BoxFit.fill,
-                                          image: AssetImage(
-                                              documentSnapshot['image']),
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 8,
-                                            bottom: 6,
-                                            left: 10,
-                                            right: 10),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.stretch,
-                                          children: [
-                                            Text(
-                                              documentSnapshot['title'],
-                                              style: const TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w700),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  bottom: 3.0, top: 4.0),
-                                              child: Text(
-                                                documentSnapshot['description'],
-                                                style: TextStyle(
-                                                  color: Colors.black
-                                                      .withOpacity(0.6),
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400,
-                                                ),
-                                              ),
-                                            ),
-                                            CustomButton(
-                                              showAddButton: documentSnapshot[
-                                                  'button_state'],
-                                              title: documentSnapshot['title'],
-                                              description: documentSnapshot[
-                                                  'description'],
-                                              image: documentSnapshot['image'],
-                                              docId: documentSnapshot.id,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            );
-                          });
-                    }
-                    if (streamSnapshot.hasError) {
-                      return Text(
-                        'Sorry, we have some problems loading featured cats 😿',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w400,
-                          color: Colors.black.withOpacity(
-                            0.6,
-                          ),
-                        ),
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: 3,
+                        itemBuilder: (context, index) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: GetShimmer(),
+                          );
+                        },
                       );
                     }
-                    return ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: 3,
-                      itemBuilder: (context, index) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: GetShimmer(),
-                        );
-                      },
-                    );
-                  },
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(top: 22, bottom: 12),
-                  child: Text(
-                    'All cats',
-                    style: TextStyle(
-                      fontSize: 34,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-                StreamBuilder(
-                  stream: _cats.snapshots(),
-                  builder:
-                      (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-                    if (streamSnapshot.hasData) {
+                    if (state is CatLoadedState) {
                       return ListView.builder(
                           physics: const NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
-                          itemCount: streamSnapshot.data!.docs.length,
+                          itemCount: state.featuredCats.length,
                           itemBuilder: (context, index) {
-                            final DocumentSnapshot documentSnapshot =
-                                streamSnapshot.data!.docs[index];
+                            final featured = state.featuredCats[index];
                             return Padding(
                               padding:
                                   const EdgeInsets.symmetric(vertical: 8.0),
@@ -193,8 +72,7 @@ class _HomePageState extends State<HomePage> {
                                             BorderRadius.circular(16.0),
                                         image: DecorationImage(
                                           fit: BoxFit.fill,
-                                          image: AssetImage(
-                                              documentSnapshot['image']),
+                                          image: AssetImage(featured.image),
                                         ),
                                       ),
                                     ),
@@ -210,7 +88,7 @@ class _HomePageState extends State<HomePage> {
                                               CrossAxisAlignment.stretch,
                                           children: [
                                             Text(
-                                              documentSnapshot['title'],
+                                              featured.title,
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w700),
@@ -219,7 +97,7 @@ class _HomePageState extends State<HomePage> {
                                               padding: const EdgeInsets.only(
                                                   bottom: 3.0, top: 4.0),
                                               child: Text(
-                                                documentSnapshot['description'],
+                                                featured.description,
                                                 style: TextStyle(
                                                   color: Colors.black
                                                       .withOpacity(0.6),
@@ -228,15 +106,35 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                             ),
-                                            CustomButton(
-                                              showAddButton: documentSnapshot[
-                                                  'button_state'],
-                                              title: documentSnapshot['title'],
-                                              description: documentSnapshot[
-                                                  'description'],
-                                              image: documentSnapshot['image'],
-                                              docId: documentSnapshot.id,
-                                            ),
+                                            featured.buttonState
+                                                ? AddButton(
+                                                    onPressed: () {
+                                                      BlocProvider.of<CatBloc>(
+                                                              context)
+                                                          .add(
+                                                        FeaturedCatAddEvent(
+                                                            title:
+                                                                featured.title,
+                                                            image:
+                                                                featured.image,
+                                                            description: featured
+                                                                .description,
+                                                            buttonState: featured
+                                                                .buttonState,
+                                                            index: index),
+                                                      );
+                                                    },
+                                                  )
+                                                : RemoveButton(
+                                                    onPressed: () {
+                                                      BlocProvider.of<CatBloc>(
+                                                              context)
+                                                          .add(
+                                                        CatBlocFeaturedCatRemoveEvent(
+                                                            index: index),
+                                                      );
+                                                    },
+                                                  ),
                                           ],
                                         ),
                                       ),
@@ -246,8 +144,144 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           });
+                    } else {
+                      return Text(
+                        'Sorry, we have some problems loading featured cats 😿',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w400,
+                          color: Colors.black.withOpacity(
+                            0.6,
+                          ),
+                        ),
+                      );
                     }
-                    if (streamSnapshot.hasError) {
+                  },
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(top: 22, bottom: 12),
+                  child: Text(
+                    'All cats',
+                    style: TextStyle(
+                      fontSize: 34,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                BlocBuilder<CatBloc, CatState>(
+                  builder: (context, state) {
+                    if (state is CatLoadingState) {
+                      return ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: 4,
+                        itemBuilder: (context, index) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: GetShimmer(),
+                          );
+                        },
+                      );
+                    }
+                    if (state is CatLoadedState) {
+                      return ListView.builder(
+                          physics: const NeverScrollableScrollPhysics(),
+                          shrinkWrap: true,
+                          itemCount: state.allCats.length,
+                          itemBuilder: (context, index) {
+                            final cat = state.allCats[index];
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: const Color(0xFFE0E0E0),
+                                    width: 1.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16.0),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 94,
+                                      height: 94,
+                                      decoration: BoxDecoration(
+                                        borderRadius:
+                                            BorderRadius.circular(16.0),
+                                        image: DecorationImage(
+                                          fit: BoxFit.fill,
+                                          image: AssetImage(cat.image),
+                                        ),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            top: 8,
+                                            bottom: 6,
+                                            left: 10,
+                                            right: 10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            Text(
+                                              cat.title,
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 3.0, top: 4.0),
+                                              child: Text(
+                                                cat.description,
+                                                style: TextStyle(
+                                                  color: Colors.black
+                                                      .withOpacity(0.6),
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w400,
+                                                ),
+                                              ),
+                                            ),
+                                            cat.buttonState
+                                                ? AddButton(
+                                                    onPressed: () {
+                                                      BlocProvider.of<CatBloc>(
+                                                              context)
+                                                          .add(
+                                                        AllCatAddEvent(
+                                                            title: cat.title,
+                                                            image: cat.image,
+                                                            description:
+                                                                cat.description,
+                                                            buttonState:
+                                                                cat.buttonState,
+                                                            index: index),
+                                                      );
+                                                    },
+                                                  )
+                                                : RemoveButton(
+                                                    onPressed: () {
+                                                      BlocProvider.of<CatBloc>(
+                                                              context)
+                                                          .add(
+                                                        CatBlocAllCatsRemoveEvent(
+                                                            index: index),
+                                                      );
+                                                    },
+                                                  ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            );
+                          });
+                    } else {
                       return Text(
                         'Sorry, we have some problems loading all other cats 😿',
                         style: TextStyle(
@@ -259,17 +293,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       );
                     }
-                    return ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: 4,
-                      itemBuilder: (context, index) {
-                        return const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
-                          child: GetShimmer(),
-                        );
-                      },
-                    );
                   },
                 ),
               ],

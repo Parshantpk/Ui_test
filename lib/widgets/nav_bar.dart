@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ui_test/home_page.dart';
-import 'package:ui_test/me_screen.dart';
+import 'package:ui_test/views/cat_screen.dart';
+import 'package:ui_test/views/me_screen.dart';
 
 class NavBar extends StatefulWidget {
   const NavBar({Key? key}) : super(key: key);
@@ -15,7 +15,7 @@ class _NavBarState extends State<NavBar> {
   _getScreen(int pos) {
     switch (pos) {
       case 0:
-        return const HomePage();
+        return const CatScreen();
       case 1:
         return const MeScreen();
     }
